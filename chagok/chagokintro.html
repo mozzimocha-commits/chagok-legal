@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>차곡 — 앱 소개</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root {
+    --ink:        #2C2967;
+    --ink-soft:   #5B5990;
+    --paper:      #FBFAF7;
+
+    --task-ink:   #B5645C;
+    --note-ink:   #B98E37;
+    --keep-ink:   #738B36;
+    --timer-ink:  #497B9B;
+
+    --bg-task:    #FFF1EF;
+    --bg-note:    #FEFAE6;
+    --bg-keep:    #F1F6DD;
+    --bg-timer:   #EEF4F2;
+
+    --font: "Pretendard", "Pretendard Variable", -apple-system, BlinkMacSystemFont,
+            "Apple SD Gothic Neo", system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font);
+    color: var(--ink);
+    background: var(--paper);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  /* ---------------- Section shell ---------------- */
+  .section {
+    width: 100%;
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 48px;
+  }
+  .inner {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+
+  /* feature two-column */
+  .feature .inner {
+    display: grid;
+    grid-template-columns: 1fr minmax(300px, 380px);
+    align-items: center;
+    gap: clamp(48px, 7vw, 120px);
+  }
+  .feature.flip .inner { grid-template-columns: minmax(300px, 380px) 1fr; }
+  .feature.flip .copy  { order: 2; }
+  .feature.flip .stage { order: 1; }
+
+  /* ---------------- Copy block ---------------- */
+  .kicker {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    margin-bottom: 22px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .kicker::before {
+    content: "";
+    width: 26px; height: 2px;
+    background: currentColor;
+    border-radius: 2px;
+    opacity: .8;
+  }
+  .headline {
+    font-size: clamp(34px, 4.4vw, 52px);
+    font-weight: 800;
+    line-height: 1.22;
+    letter-spacing: -.025em;
+    color: var(--ink);
+    text-wrap: pretty;
+  }
+  .desc {
+    margin-top: 26px;
+    font-size: clamp(19px, 1.5vw, 22px);
+    font-weight: 500;
+    line-height: 1.75;
+    color: var(--ink);
+    text-wrap: pretty;
+    max-width: 30ch;
+  }
+  .desc.center { max-width: 36ch; margin-left: auto; margin-right: auto; }
+
+  /* ---------------- Phone mockup ---------------- */
+  .stage { display: flex; justify-content: center; }
+  .phone {
+    --screen-bg: #fff;
+    width: 300px;
+    flex: none;
+  }
+  .phone-frame {
+    background: linear-gradient(150deg, #2b2b30, #131316);
+    border-radius: 52px;
+    padding: 10px;
+    box-shadow:
+      0 2px 4px rgba(0,0,0,.5) inset,
+      0 50px 90px -28px rgba(44,41,103,.42),
+      0 14px 30px -16px rgba(44,41,103,.30);
+  }
+  .phone-screen {
+    position: relative;
+    border-radius: 43px;
+    overflow: hidden;
+    background: var(--screen-bg);
+    aspect-ratio: 1206 / 2622;
+  }
+  .phone-screen img {
+    width: 100%;
+    display: block;
+  }
+  /* cover the original status bar (time / signal / battery) */
+  .status-cover {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 7.2%;
+    background: var(--screen-bg);
+    z-index: 2;
+  }
+  .island {
+    position: absolute;
+    top: 2.3%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 33%;
+    height: 3.35%;
+    background: #000;
+    border-radius: 999px;
+    z-index: 3;
+  }
+
+  /* ---------------- Hero ---------------- */
+  .hero { background: var(--paper); text-align: center; position: relative; }
+  .hero .inner { display: flex; flex-direction: column; align-items: center; }
+  .wordmark {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    margin-bottom: 52px;
+  }
+  .wordmark .logo { font-size: 30px; font-weight: 800; letter-spacing: -.02em; color: var(--ink); }
+  .wordmark .en   { font-size: 13px; font-weight: 700; letter-spacing: .42em; color: var(--ink-soft); padding-left: .42em; }
+
+  .hero .headline { font-size: clamp(38px, 5.6vw, 66px); line-height: 1.18; }
+  .hero .desc { margin-top: 30px; font-size: clamp(19px, 1.6vw, 23px); }
+  .hero .stage { margin-top: 58px; }
+  .hero .phone { width: 296px; }
+
+  .scrollcue {
+    position: absolute;
+    bottom: 30px; left: 50%; transform: translateX(-50%);
+    font-size: 13px; font-weight: 600; letter-spacing: .04em;
+    color: var(--ink-soft); opacity: .7;
+    display: flex; flex-direction: column; align-items: center; gap: 7px;
+  }
+  .scrollcue .dot {
+    width: 5px; height: 5px; border-radius: 50%; background: currentColor;
+    animation: bob 1.8s ease-in-out infinite;
+  }
+  @keyframes bob { 0%,100% { transform: translateY(0); opacity:.5;} 50%{ transform: translateY(6px); opacity:1;} }
+
+  /* ---------------- Footer ---------------- */
+  .footer {
+    min-height: 56svh;
+    background: var(--ink);
+    color: #fff;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; gap: 18px; padding: 80px 48px;
+  }
+  .footer .big { font-size: clamp(30px, 4vw, 46px); font-weight: 800; letter-spacing: -.025em; line-height:1.3; text-wrap: pretty; }
+  .footer .sub { font-size: 18px; font-weight: 500; color: rgba(255,255,255,.72); line-height: 1.7; }
+  .footer .fmark { margin-top: 14px; font-size: 13px; font-weight: 700; letter-spacing: .42em; color: rgba(255,255,255,.5); padding-left:.42em; }
+
+  /* ---------------- Reveal animation ---------------- */
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1); }
+    .reveal.in { opacity: 1; transform: none; }
+    .reveal.d1 { transition-delay: .08s; }
+    .reveal.d2 { transition-delay: .16s; }
+  }
+
+  /* ---------------- Responsive ---------------- */
+  @media (max-width: 860px) {
+    .section { padding: 72px 26px; }
+    .feature .inner, .feature.flip .inner { grid-template-columns: 1fr; gap: 44px; }
+    .feature .copy, .feature.flip .copy { order: 1; text-align: center; }
+    .feature .stage, .feature.flip .stage { order: 2; }
+    .desc, .feature.flip .desc { max-width: 34ch; margin-left: auto; margin-right: auto; }
+    .kicker { justify-content: center; }
+    .phone { width: 268px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ============ HERO / 메인 화면 ============ -->
+  <section class="section hero" data-screen-label="메인">
+    <div class="inner">
+      <div class="wordmark reveal">
+        <span class="logo">차곡</span>
+        <span class="en">CHAGOK</span>
+      </div>
+      <h1 class="headline reveal d1">흩어진 생각과 할 일을<br>차곡차곡</h1>
+      <p class="desc center reveal d2">할 일, 메모, 물건 위치, 타이머까지<br>자주 잊는 것들을 한곳에 모아두세요</p>
+      <div class="stage reveal d2">
+        <div class="phone" style="--screen-bg:#ffffff;">
+          <div class="phone-frame">
+            <div class="phone-screen">
+              <div class="status-cover"></div>
+              <div class="island"></div>
+              <img src="v3/shots/main.png" alt="차곡 메인 화면">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="scrollcue">
+      <span>아래로 둘러보기</span>
+      <span class="dot"></span>
+    </div>
+  </section>
+
+  <!-- ============ 오늘 할 일 ============ -->
+  <section class="section feature" style="background:var(--bg-task);" data-screen-label="오늘 할 일">
+    <div class="inner">
+      <div class="copy">
+        <div class="kicker reveal" style="color:var(--task-ink);">오늘 할 일</div>
+        <h2 class="headline reveal d1">하나씩 적고,<br>하나씩 끝내요</h2>
+        <p class="desc reveal d2">복잡한 계획은 잠시 미뤄두고 오늘 할 일부터.<br>끝낸 일들은 차곡차곡 모여 작은 성취가 돼요.</p>
+      </div>
+      <div class="stage reveal d1">
+        <div class="phone" style="--screen-bg:#ffebea;">
+          <div class="phone-frame">
+            <div class="phone-screen">
+              <div class="status-cover"></div>
+              <div class="island"></div>
+              <img src="v3/shots/todo.png" alt="오늘 할 일 화면">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 메모장 ============ -->
+  <section class="section feature flip" style="background:var(--bg-note);" data-screen-label="메모장">
+    <div class="inner">
+      <div class="copy">
+        <div class="kicker reveal" style="color:var(--note-ink);">메모장</div>
+        <h2 class="headline reveal d1">적기만 하세요,<br>분류는 차곡이 해요</h2>
+        <p class="desc reveal d2">아이디어, 사고 싶은 것, 링크까지.<br>아무렇게나 적어도 태그별로 알아서 정리해 줘요.</p>
+      </div>
+      <div class="stage reveal d1">
+        <div class="phone" style="--screen-bg:#fef8db;">
+          <div class="phone-frame">
+            <div class="phone-screen">
+              <div class="status-cover"></div>
+              <div class="island"></div>
+              <img src="v3/shots/note.png" alt="메모장 화면">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 물건 보관소 ============ -->
+  <section class="section feature" style="background:var(--bg-keep);" data-screen-label="물건 보관소">
+    <div class="inner">
+      <div class="copy">
+        <div class="kicker reveal" style="color:var(--keep-ink);">물건 보관소</div>
+        <h2 class="headline reveal d1">어디 뒀는지<br>사진으로 기억해요</h2>
+        <p class="desc reveal d2">자주 잃어버리는 물건은 둔 자리를 사진으로.<br>"어디 뒀더라" 하는 순간을 줄여줘요.</p>
+      </div>
+      <div class="stage reveal d1">
+        <div class="phone" style="--screen-bg:#e9f2ca;">
+          <div class="phone-frame">
+            <div class="phone-screen">
+              <div class="status-cover"></div>
+              <div class="island"></div>
+              <img src="v3/shots/keep.png" alt="물건 보관소 화면">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 타이머 ============ -->
+  <section class="section feature flip" style="background:var(--bg-timer);" data-screen-label="타이머">
+    <div class="inner">
+      <div class="copy">
+        <div class="kicker reveal" style="color:var(--timer-ink);">타이머</div>
+        <h2 class="headline reveal d1">남은 시간이<br>눈에 보여요</h2>
+        <p class="desc reveal d2">일을 마칠 시간을 정하면 물이 차곡차곡 줄어들어요.<br>숫자보다 직관적으로 남은 시간을 느낄 수 있어요.</p>
+      </div>
+      <div class="stage reveal d1">
+        <div class="phone" style="--screen-bg:#edf2f0;">
+          <div class="phone-frame">
+            <div class="phone-screen">
+              <div class="status-cover"></div>
+              <div class="island"></div>
+              <img src="v3/shots/timer.png" alt="타이머 화면">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 마무리 ============ -->
+  <footer class="footer" data-screen-label="마무리">
+    <div class="big reveal">자주 잊는 것들을, 차곡차곡</div>
+    <div class="sub reveal d1">할 일 · 메모 · 물건 위치 · 타이머<br>흩어진 하루를 한곳에 모아두세요</div>
+    <div class="fmark reveal d2">CHAGOK</div>
+  </footer>
+
+  <script>
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold: 0.18 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  </script>
+</body>
+</html>
